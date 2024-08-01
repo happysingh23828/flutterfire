@@ -36,6 +36,8 @@ NotificationSettings getNotificationSettings(String? status) {
     notificationCenter: AppleNotificationSetting.notSupported,
     showPreviews: AppleShowPreviewSetting.notSupported,
     sound: AppleNotificationSetting.notSupported,
+    timeSensitive: AppleNotificationSetting.notSupported,
+    criticalAlert: AppleNotificationSetting.notSupported,
   );
 }
 
@@ -72,7 +74,7 @@ Map<String, dynamic> messagePayloadToMap(MessagePayload messagePayload) {
     'contentAvailable': null,
     'data': data,
     'from': messagePayload.from,
-    'messageId': null,
+    'messageId': messagePayload.messageId,
     'mutableContent': null,
     'notification': messagePayload.notification == null
         ? null

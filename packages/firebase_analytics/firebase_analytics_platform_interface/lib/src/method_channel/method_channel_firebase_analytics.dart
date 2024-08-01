@@ -34,8 +34,26 @@ class MethodChannelFirebaseAnalytics extends FirebaseAnalyticsPlatform {
       MethodChannel('plugins.flutter.io/firebase_analytics');
 
   @override
-  FirebaseAnalyticsPlatform delegateFor({required FirebaseApp app}) {
+  FirebaseAnalyticsPlatform delegateFor({
+    required FirebaseApp app,
+    Map<String, dynamic>? webOptions,
+  }) {
     return MethodChannelFirebaseAnalytics(app: app);
+  }
+
+  /// Returns "true" as this API is used to inform users of web browser support
+  @override
+  Future<bool> isSupported() {
+    return Future.value(true);
+  }
+
+  @override
+  Future<int?> getSessionId() {
+    try {
+      return channel.invokeMethod<int>('Analytics#getSessionId');
+    } catch (e, s) {
+      convertPlatformException(e, s);
+    }
   }
 
   @override
@@ -58,6 +76,11 @@ class MethodChannelFirebaseAnalytics extends FirebaseAnalyticsPlatform {
   Future<void> setConsent({
     bool? adStorageConsentGranted,
     bool? analyticsStorageConsentGranted,
+    bool? adPersonalizationSignalsConsentGranted,
+    bool? adUserDataConsentGranted,
+    bool? functionalityStorageConsentGranted,
+    bool? personalizationStorageConsentGranted,
+    bool? securityStorageConsentGranted,
   }) async {
     try {
       return channel.invokeMethod<void>(
@@ -67,6 +90,11 @@ class MethodChannelFirebaseAnalytics extends FirebaseAnalyticsPlatform {
             'adStorageConsentGranted': adStorageConsentGranted,
           if (analyticsStorageConsentGranted != null)
             'analyticsStorageConsentGranted': analyticsStorageConsentGranted,
+          if (adPersonalizationSignalsConsentGranted != null)
+            'adPersonalizationSignalsConsentGranted':
+                adPersonalizationSignalsConsentGranted,
+          if (adUserDataConsentGranted != null)
+            'adUserDataConsentGranted': adUserDataConsentGranted,
         },
       );
     } catch (e, s) {
@@ -76,7 +104,7 @@ class MethodChannelFirebaseAnalytics extends FirebaseAnalyticsPlatform {
 
   @override
   Future<void> setDefaultEventParameters(
-    Map<String, Object> defaultParameters,
+    Map<String, Object?>? defaultParameters,
   ) async {
     try {
       return channel.invokeMethod<void>(
@@ -163,6 +191,15 @@ class MethodChannelFirebaseAnalytics extends FirebaseAnalyticsPlatform {
   }
 
   @override
+  Future<String?> getAppInstanceId() {
+    try {
+      return channel.invokeMethod<String?>('Analytics#getAppInstanceId');
+    } catch (e, s) {
+      convertPlatformException(e, s);
+    }
+  }
+
+  @override
   Future<void> setSessionTimeoutDuration(Duration timeout) async {
     try {
       if (Platform.isAndroid) {
@@ -171,6 +208,28 @@ class MethodChannelFirebaseAnalytics extends FirebaseAnalyticsPlatform {
           'milliseconds': timeout.inMilliseconds,
         });
       }
+    } catch (e, s) {
+      convertPlatformException(e, s);
+    }
+  }
+
+  @override
+  Future<void> initiateOnDeviceConversionMeasurement({
+    String? emailAddress,
+    String? phoneNumber,
+    String? hashedEmailAddress,
+    String? hashedPhoneNumber,
+  }) {
+    try {
+      return channel.invokeMethod<void>(
+        'Analytics#initiateOnDeviceConversionMeasurement',
+        <String, String?>{
+          'emailAddress': emailAddress,
+          'phoneNumber': phoneNumber,
+          'hashedEmailAddress': hashedEmailAddress,
+          'hashedPhoneNumber': hashedPhoneNumber,
+        },
+      );
     } catch (e, s) {
       convertPlatformException(e, s);
     }

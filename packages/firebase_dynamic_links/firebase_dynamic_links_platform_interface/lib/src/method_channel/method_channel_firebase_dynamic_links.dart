@@ -4,8 +4,9 @@
 
 import 'dart:async';
 
-import 'package:firebase_dynamic_links_platform_interface/firebase_dynamic_links_platform_interface.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links_platform_interface/firebase_dynamic_links_platform_interface.dart';
+import 'package:firebase_dynamic_links_platform_interface/src/method_channel/utils/convert_match_type.dart';
 import 'package:flutter/services.dart';
 
 import 'utils/exception.dart';
@@ -96,8 +97,12 @@ class MethodChannelFirebaseDynamicLinks extends FirebaseDynamicLinksPlatform {
     PendingDynamicLinkDataIOS? iosData;
     if (linkData['ios'] != null) {
       final Map<dynamic, dynamic> data = linkData['ios'];
-      iosData =
-          PendingDynamicLinkDataIOS(minimumVersion: data['minimumVersion']);
+
+      MatchType? matchType = convertMatchType(data['matchType']);
+      iosData = PendingDynamicLinkDataIOS(
+        minimumVersion: data['minimumVersion'],
+        matchType: matchType,
+      );
     }
 
     return PendingDynamicLinkData(
@@ -106,7 +111,7 @@ class MethodChannelFirebaseDynamicLinks extends FirebaseDynamicLinksPlatform {
       ios: iosData,
       utmParameters: linkData['utmParameters'] == null
           ? {}
-          : Map<String, String>.from(linkData['utmParameters']),
+          : Map<String, String?>.from(linkData['utmParameters']),
     );
   }
 

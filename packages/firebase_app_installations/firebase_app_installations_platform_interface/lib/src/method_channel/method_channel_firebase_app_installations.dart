@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:_flutterfire_internals/_flutterfire_internals.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_app_installations_platform_interface/firebase_app_installations_platform_interface.dart';
 import 'package:flutter/services.dart';
@@ -37,9 +38,9 @@ class MethodChannelFirebaseAppInstallations
       'appName': app.name,
     }).then((channelName) {
       final events = EventChannel(channelName!, channel.codec);
+
       events
-          .receiveBroadcastStream()
-          .handleError(convertPlatformException)
+          .receiveGuardedBroadcastStream(onError: convertPlatformException)
           .listen(
             (Object? arguments) => controller.add((arguments as Map)['token']),
             onError: controller.addError,
@@ -72,12 +73,12 @@ class MethodChannelFirebaseAppInstallations
   @override
   Future<String> getId() async {
     try {
-      String? id =
-          await channel.invokeMethod<String>('FirebaseInstallations#getId', {
-        'appName': app!.name,
-      });
+      final id = (await channel.invokeMethod<String>(
+        'FirebaseInstallations#getId',
+        {'appName': app!.name},
+      ))!;
 
-      return id!;
+      return id;
     } catch (e, s) {
       convertPlatformException(e, s);
     }
@@ -86,11 +87,12 @@ class MethodChannelFirebaseAppInstallations
   @override
   Future<String> getToken(bool forceRefresh) async {
     try {
-      String? id = await channel.invokeMethod<String>(
-          'FirebaseInstallations#getToken',
-          {'appName': app!.name, 'forceRefresh': forceRefresh});
+      final id = (await channel.invokeMethod<String>(
+        'FirebaseInstallations#getToken',
+        {'appName': app!.name, 'forceRefresh': forceRefresh},
+      ))!;
 
-      return id!;
+      return id;
     } catch (e, s) {
       convertPlatformException(e, s);
     }
